@@ -16,7 +16,7 @@ const studentSchema = new Schema(
             type: String,
             required: true,
         },
-        classSchedule : { // from admin
+        classSchedule : {
             type: String,
             enum: ["Weekdays (Monday to Friday)", "Weekend (Saturday & Sunday)", "Both"],
             required: true,
@@ -68,6 +68,14 @@ const studentSchema = new Schema(
             type: String,
             default: "student",
             required: true,
+        },
+        dob:{
+            type: Date,
+            required: true,
+        },
+        enrolledClass:{
+            type: Schema.Types.ObjectId,
+            ref: "Class",
         },
         refreshToken:{
             type: String,

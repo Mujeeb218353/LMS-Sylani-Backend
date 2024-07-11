@@ -38,6 +38,10 @@ const teacherSchema = new Schema(
             type: String,
             required: true,
         },
+        instructorOfClass: {
+            type: Schema.Types.ObjectId,
+            ref: "Class",
+        },
         isVerified:{
             type: Boolean,
             default: false,
