@@ -2,6 +2,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
 import { Teacher } from "../models/teacher.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
+import {
+    uploadOnCloudinary,
+    deleteFromCloudinary,
+} from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
@@ -31,16 +35,39 @@ const registerTeacher = asyncHandler(async (req, res) => {
         fullName,
         email,
         password,
+        role,
+        gender,
+        phoneNumber,
+        course
     } = req.body;
     if (
         [
             fullName,
             email,
             password,
+            fullName,
+            email,
+            password,
+            role,
+            gender,
+            phoneNumber,
+            course
         ].some((field) => String(field).trim() === "")
 
     ) {
         throw new apiError(400, "All fields are required");
+    }
+
+    const profileLocalPath = req.file?.path
+
+    if (!profileLocalPath) {
+        throw new apiError(400, "Profile image is required")
+    }
+
+    const profile = await uploadOnCloudinary(profileLocalPath)
+
+    if (!profile) {
+        throw new apiError(400, "Profile image upload failed")
     }
 
     const existedTeacher = await Teacher.findOne({
@@ -48,13 +75,21 @@ const registerTeacher = asyncHandler(async (req, res) => {
     });
 
     if (existedTeacher) {
-        throw new apiError(400, "Teacher already exists");
+        throw new apiError(400, "User already exists");
     }
 
     const newTeacher = new Teacher({
         fullName,
         email,
         password,
+        fullName,
+        email,
+        profile: profile.secure_url,
+        password,
+        role,
+        gender,
+        phoneNumber,
+        course
     }
     )
 
@@ -66,7 +101,7 @@ const registerTeacher = asyncHandler(async (req, res) => {
         throw new apiError(500, "Something went wrong while creating user");
     }
 
-    res.status(201).json(new apiResponse(200, createdTeacher, "teacher created successfully"));
+    res.status(201).json(new apiResponse(200, createdTeacher, "User created successfully"));
 
 });
 

@@ -17,9 +17,11 @@ app.use(express.urlencoded({ extended: false }));
 
 import studentRouter from './routes/student.routes.js';
 import teacherRouter from './routes/teacher.routes.js';
+import adminRouter from './routes/admin.routes.js';
 
 // routes 
 app.use("/api/student", studentRouter);
 app.use("/api/teacher", teacherRouter);
+app.use("/api/admin", adminRouter);
 
 export default app;

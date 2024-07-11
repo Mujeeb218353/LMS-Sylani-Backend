@@ -31,15 +31,6 @@ const generateAccessAndRefreshToken = async (studentId) => {
     }
 }
 
-const generateStudentAccessToken = async (studentId) => {
-    try {
-        const student = await Student.findById(studentId)
-        return student.generateAccessToken()
-    } catch (error) {
-        throw new apiError(500, "Something went wrong while generating access token")
-    }
-}
-
 const registerStudent = asyncHandler(async (req, res) => {
     const {
         city,
@@ -85,7 +76,7 @@ const registerStudent = asyncHandler(async (req, res) => {
     })
 
     if (existedStudent) {
-        throw new apiError(400, "Student already exists")
+        throw new apiError(400, "User already exists")
     }
 
     const profileLocalPath = req.file?.path
@@ -116,8 +107,7 @@ const registerStudent = asyncHandler(async (req, res) => {
         lastQualification,
         password,
         profile: profile.secure_url,
-    }
-    )
+    })
 
 
     await newStudent.save()
@@ -141,8 +131,9 @@ const registerStudent = asyncHandler(async (req, res) => {
                 accessToken,
                 refreshToken
             },
-            "Student created successfully"
-        ))
+            "User created successfully"
+        )
+    )
 
 })
 
@@ -162,7 +153,7 @@ const loginStudent = asyncHandler(async (req, res) => {
     })
 
     if (!student) {
-        throw new apiError(400, "Student not found")
+        throw new apiError(400, "User not found")
     }
 
     const isPasswordCorrect = await student.isPasswordCorrect(password)
@@ -196,7 +187,7 @@ const loginStudent = asyncHandler(async (req, res) => {
                     accessToken,
                     refreshToken,
                 },
-                "Student Logged in Successfully"
+                "Logged in Successfully"
             )
         )
 })
@@ -226,19 +217,19 @@ const logoutStudent = asyncHandler(async (req, res) => {
             new apiResponse(
                 200,
                 null,
-                "Student logged out successfully"
+                "Logged out successfully"
             )
         )
 })
 
 const getCurrentStudent = asyncHandler(async (req, res) => {
-    res.status(200).json(new apiResponse(200, req.student, "Student fetched successfully"))
+    res.status(200).json(new apiResponse(200, req.student, "User data fetched successfully"))
 })
 
 const refreshStudentAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken || req.header("Authorization")?.replace("Bearer ", "");
     if (!incomingRefreshToken) {
-        throw new apiError(401, "unauthorized request 1234")
+        throw new apiError(401, "unauthorized request")
     }
 
     try {
@@ -246,7 +237,6 @@ const refreshStudentAccessToken = asyncHandler(async (req, res) => {
             incomingRefreshToken,
             process.env.REFRESH_TOKEN_SECRET
         )
-        console.log("decodedToken: ", decodedToken);
         const student = await Student.findById(decodedToken?._id)
 
         if (!student) {
@@ -256,32 +246,27 @@ const refreshStudentAccessToken = asyncHandler(async (req, res) => {
         if (incomingRefreshToken !== student?.refreshToken) {
             throw new apiError(401, "Refresh token is expired or used")
         }
-        const options = {
-            httpOnly: true,
-            secure: true,
-        }
 
-        const { accessToken, refreshToken } =
-            await generateAccessAndRefreshToken(student._id);
-        console.log("newRefreshToken: ", refreshToken);
+        const { accessToken, refreshToken } = await generateAccessAndRefreshToken(student._id)
+
         return res
             .status(200)
             .cookie(
                 "accessToken",
                 accessToken,
-                options
+                cookieOptions
             )
             .cookie(
                 "refreshToken",
                 refreshToken,
-                options
+                cookieOptions
             )
             .json(
                 new apiResponse(
                     200,
                     {
                         accessToken,
-                        refreshToken: refreshToken
+                        refreshToken
                     },
                     "Access token refreshed"
                 )

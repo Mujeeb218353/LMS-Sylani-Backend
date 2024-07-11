@@ -5,12 +5,13 @@ import {
     logoutTeacher,
     getCurrentTeacher,
     refreshTeacherAccessToken,
-} from '../controllers/teacher.controller.js'
+} from '../controllers/teacher.controllers.js'
+import { upload } from '../middlewares/multer.middleware.js'
 import { verifyTeacherJWT } from '../middlewares/teacher.auth.middleware.js'
 
 const router = Router()
 
-router.route('/register').post(registerTeacher);
+router.route('/register').post(upload.single('profile'), registerTeacher);
 
 router.route('/login').post(loginTeacher)
 

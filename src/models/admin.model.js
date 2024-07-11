@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const teacherSchema = new Schema(
+const adminSchema = new Schema(
     {
         fullName: {
             type: String,
@@ -23,11 +23,7 @@ const teacherSchema = new Schema(
         },
         role:{
             type: String,
-            default: "teacher",
-            required: true,
-        },
-        course:{
-            type: String,
+            default: "admin",
             required: true,
         },
         phoneNumber: {
@@ -51,7 +47,7 @@ const teacherSchema = new Schema(
     }
 );
 
-teacherSchema.pre("save", async function (next) {
+adminSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         return next();
     }
@@ -59,11 +55,11 @@ teacherSchema.pre("save", async function (next) {
     next();
 });
 
-teacherSchema.methods.isPasswordCorrect = async function (password) {
+adminSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 
-teacherSchema.methods.generateAccessToken = function () {
+adminSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
             _id: this._id,
@@ -77,7 +73,7 @@ teacherSchema.methods.generateAccessToken = function () {
     );
 };
 
-teacherSchema.methods.generateRefreshToken = function () {
+adminSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
             _id: this._id,
@@ -89,4 +85,4 @@ teacherSchema.methods.generateRefreshToken = function () {
     );
 };
 
-export const Teacher = mongoose.model("Teacher", teacherSchema);
+export const Admin = mongoose.model("Admin", adminSchema);

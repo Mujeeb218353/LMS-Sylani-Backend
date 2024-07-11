@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const studentSchema = Schema(
+const studentSchema = new Schema(
     {
         city:{ // from admin
             type: String,
@@ -71,6 +71,10 @@ const studentSchema = Schema(
         },
         refreshToken:{
             type: String,
+        },
+        isVerified:{
+            type: Boolean,
+            default: false,
         }
     },
     {
