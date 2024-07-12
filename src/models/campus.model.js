@@ -1,17 +1,20 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 
-const courseSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
+const campusSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: Schema.Types.ObjectId,
+      ref: 'City',
+      required: true
+    }
   },
-  campus: {
-    type: Schema.Types.ObjectId,
-    ref: 'Campus',
-    required: true,
-  },
-});
+  {
+    timestamps: true
+  }
+);
 
-const Course = mongoose.model('Course', courseSchema);
-
-export default Course;
+export const Campus = mongoose.model('Campus', campusSchema);

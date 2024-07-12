@@ -7,7 +7,6 @@ import {
 } from "../utils/cloudinary.js"
 import { apiResponse } from "../utils/apiResponse.js"
 import jwt from "jsonwebtoken"
-import mongoose from "mongoose"
 
 const cookieOptions = {
     httpOnly: true,
