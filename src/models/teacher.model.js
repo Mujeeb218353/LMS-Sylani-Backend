@@ -26,8 +26,19 @@ const teacherSchema = new Schema(
             default: "teacher",
             required: true,
         },
+        city:{
+            type: Schema.Types.ObjectId,
+            ref: "City",
+            required: true,
+        },
+        campus:{
+            type: Schema.Types.ObjectId,
+            ref: "Campus",
+            required: true,
+        },
         course:{
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: "Course",
             required: true,
         },
         phoneNumber: {
@@ -41,6 +52,11 @@ const teacherSchema = new Schema(
         instructorOfClass: {
             type: Schema.Types.ObjectId,
             ref: "Class",
+        },
+        createdBy: {
+            type: Schema.Types.ObjectId,
+            ref: "Admin",
+            required: true,
         },
         isVerified:{
             type: Boolean,

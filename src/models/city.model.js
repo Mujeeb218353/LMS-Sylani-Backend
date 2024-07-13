@@ -7,6 +7,11 @@ const citySchema = new Schema(
       required: true,
       unique: true
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "Admin", 
+      required: true
+    },
   },
   {
     timestamps: true

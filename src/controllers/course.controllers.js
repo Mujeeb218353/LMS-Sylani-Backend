@@ -4,10 +4,11 @@ import { City } from "../models/city.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { apiError } from "../utils/apiError.js";
 import { Course } from "../models/course.model.js";
+import { Admin } from "../models/admin.model.js";
 
 const addCourse = asyncHandler(async (req, res) => {
 
-    const { name, cityId, campusId } = req.body;
+    const { name, cityId, campusId, userId } = req.body;
 
     if (!name) {
         throw new apiError(400, "Course name is required");
@@ -21,6 +22,11 @@ const addCourse = asyncHandler(async (req, res) => {
         throw new apiError(400, "Campus is required");
     }
 
+    if (!userId) {
+        throw new apiError(400, "User is required");
+    }
+
+    const user = await Admin.findById({ _id: userId });
     const city = await City.findById(cityId);
     const campus = await Campus.findById(campusId);
 
@@ -32,10 +38,15 @@ const addCourse = asyncHandler(async (req, res) => {
         throw new apiError(404, "Campus not found");
     }
 
+    if (!user) {
+        throw new apiError(404, "Unauthorized user")
+    }
+
     const newCourse = new Course({
         name,
         city: cityId,
-        campus: campusId
+        campus: campusId,
+        createdBy: userId,
     });
 
     await newCourse.save();

@@ -38,19 +38,21 @@ const registerTeacher = asyncHandler(async (req, res) => {
         role,
         gender,
         phoneNumber,
-        course
+        city,
+        campus,
+        course,
+        userId
     } = req.body;
     if (
         [
             fullName,
             email,
             password,
-            fullName,
-            email,
-            password,
             role,
             gender,
             phoneNumber,
+            city,
+            campus,
             course
         ].some((field) => String(field).trim() === "")
 
@@ -89,7 +91,10 @@ const registerTeacher = asyncHandler(async (req, res) => {
         role,
         gender,
         phoneNumber,
-        course
+        city,
+        campus,
+        course,
+        createdBy: userId
     }
     )
 

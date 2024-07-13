@@ -4,7 +4,8 @@ const classSchema = new Schema(
     {
         name: {
             type: String,
-            required: true
+            required: true,
+            unique: true,
         },
         enrollmentKey: {
             type: String,
@@ -24,26 +25,28 @@ const classSchema = new Schema(
             ref: "Teacher",
             required: true,
         },
-        course: {
-            type: Schema.Types.ObjectId,
-            ref: "Course",
-            required: true,
-        },
         students: [
             {
-                type: Schema.Types.ObjectId,
-                ref: "Student",
+                studentId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Student",
+                }
             }
         ],
+        city: {
+            type: Schema.Types.ObjectId,
+            ref: "City",
+            required: true
+        },
         campus: {
             type: Schema.Types.ObjectId,
             ref: "Campus",
             required: true
         },
-        city: {
+        course: {
             type: Schema.Types.ObjectId,
-            ref: "City",
-            required: true
+            ref: "Course",
+            required: true,
         },
         createdBy: {
             type: Schema.Types.ObjectId,

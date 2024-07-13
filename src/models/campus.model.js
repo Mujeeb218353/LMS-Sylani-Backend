@@ -10,7 +10,12 @@ const campusSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'City',
       required: true
-    }
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "Admin", 
+      required: true
+    },
   },
   {
     timestamps: true
