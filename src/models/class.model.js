@@ -53,6 +53,28 @@ const classSchema = new Schema(
             ref: "Admin",
             required: true
         },
+        isCompleted:{
+            type: Boolean,
+            default: false
+        },
+        assignments: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Assignment"
+            }
+        ],
+        quizzes: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Quiz"
+            }
+        ],
+        attendances: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Attendance"
+            }
+        ],
     },
     {
         timestamps: true,

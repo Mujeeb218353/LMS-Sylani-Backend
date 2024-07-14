@@ -7,7 +7,7 @@ const assignmentSchema = new Schema(
             ref: "Teacher",
             required: true,
         },
-        classCode: {
+        className: {
             type: Schema.Types.ObjectId,
             ref: "Class",
             required: true,

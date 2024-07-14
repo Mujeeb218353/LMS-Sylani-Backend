@@ -84,6 +84,11 @@ const addClass = asyncHandler(async (req, res) => {
         throw new apiError(404, "Course not found")
     }
 
+    if(teacher.instructorOfClass){
+        throw new apiError(400, "Teacher is already assigned to a class")
+    }
+
+
     const newClass = new Class({
         name,
         enrollmentKey,
@@ -96,7 +101,19 @@ const addClass = asyncHandler(async (req, res) => {
         createdBy: userId
     })
 
+
     await newClass.save()
+
+    if(!newClass){
+        throw new apiError(500, "Something went wrong while creating class")    
+    }
+
+    teacher.instructorOfClass = newClass._id
+    const savedTeacher = await teacher.save({ validateBeforeSave: false })
+
+    if(!savedTeacher){
+        throw new apiError(500, "Something went wrong while assigning teacher to class")
+    }
 
     res.status(201).json(new apiResponse(201, newClass, "Class created successfully"));
 })

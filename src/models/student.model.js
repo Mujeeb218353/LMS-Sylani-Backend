@@ -73,9 +73,10 @@ const studentSchema = new Schema(
             type: Date,
             required: true,
         },
-        enrolledClass:{
+        enrolledInClass:{
             type: Schema.Types.ObjectId,
             ref: "Class",
+            default: null,
         },
         refreshToken:{
             type: String,
