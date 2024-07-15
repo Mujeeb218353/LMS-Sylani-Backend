@@ -27,10 +27,8 @@ const classSchema = new Schema(
         },
         students: [
             {
-                studentId: {
-                    type: Schema.Types.ObjectId,
-                    ref: "Student",
-                }
+                type: Schema.Types.ObjectId,
+                ref: "Student",
             }
         ],
         city: {
@@ -53,7 +51,12 @@ const classSchema = new Schema(
             ref: "Admin",
             required: true
         },
-        isCompleted:{
+        updatedBy:{
+            type: Schema.Types.ObjectId,
+            ref: "Admin" || "Teacher",
+            default: null
+        },
+        isCompleted: {
             type: Boolean,
             default: false
         },

@@ -8,6 +8,8 @@ import { City } from "../models/city.model.js"
 import { Campus } from "../models/campus.model.js"
 import { Course } from "../models/course.model.js"
 import { Class } from "../models/class.model.js"
+import { Assignment } from "../models/assignment.model.js"
+import { Quiz } from "../models/quiz.model.js"
 
 const addClass = asyncHandler(async (req, res) => {
     const {
@@ -22,39 +24,39 @@ const addClass = asyncHandler(async (req, res) => {
         userId
     } = req.body
 
-    if(!name){
+    if (!name) {
         throw new apiError(400, "Class name is required")
     }
 
-    if(!enrollmentKey){
+    if (!enrollmentKey) {
         throw new apiError(400, "Enrollment key is required")
     }
 
-    if(!batch){
+    if (!batch) {
         throw new apiError(400, "Batch is required")
     }
 
-    if(!timing){
+    if (!timing) {
         throw new apiError(400, "Timing is required")
     }
 
-    if(!teacherId){
+    if (!teacherId) {
         throw new apiError(400, "Teacher is required")
     }
 
-    if(!cityId){
+    if (!cityId) {
         throw new apiError(400, "City is required")
     }
 
-    if(!courseId){
+    if (!courseId) {
         throw new apiError(400, "Course is required")
     }
 
-    if(!campusId){
+    if (!campusId) {
         throw new apiError(400, "Campus is required")
     }
 
-    if(!userId){
+    if (!userId) {
         throw new apiError(400, "User is required")
     }
 
@@ -64,27 +66,27 @@ const addClass = asyncHandler(async (req, res) => {
     const campus = await Campus.findById({ _id: campusId });
     const course = await Course.findById({ _id: courseId });
 
-    if(!user){
+    if (!user) {
         throw new apiError(404, "Unauthorized user")
     }
 
-    if(!teacher){
+    if (!teacher) {
         throw new apiError(404, "Teacher not found")
     }
 
-    if(!city){
+    if (!city) {
         throw new apiError(404, "City not found")
     }
 
-    if(!campus){
+    if (!campus) {
         throw new apiError(404, "Campus not found")
     }
 
-    if(!course){
+    if (!course) {
         throw new apiError(404, "Course not found")
     }
 
-    if(teacher.instructorOfClass){
+    if (teacher.instructorOfClass) {
         throw new apiError(400, "Teacher is already assigned to a class")
     }
 
@@ -104,14 +106,14 @@ const addClass = asyncHandler(async (req, res) => {
 
     await newClass.save()
 
-    if(!newClass){
-        throw new apiError(500, "Something went wrong while creating class")    
+    if (!newClass) {
+        throw new apiError(500, "Something went wrong while creating class")
     }
 
     teacher.instructorOfClass = newClass._id
     const savedTeacher = await teacher.save({ validateBeforeSave: false })
 
-    if(!savedTeacher){
+    if (!savedTeacher) {
         throw new apiError(500, "Something went wrong while assigning teacher to class")
     }
 
@@ -136,14 +138,30 @@ const getClass = asyncHandler(async (req, res) => {
     res.status(200).json(new apiResponse(200, savedClass, "Class fetched successfully"));
 })
 
-const getClasses = asyncHandler(async (req, res) => {
-    const classes = await Class.find({}).populate("teacher").populate("city").populate("campus").populate("course").populate("createdBy")
-    res.status(200).json(new apiResponse(200, classes, "Classes fetched successfully"));
+const getStudentClass = asyncHandler(async (req, res) => {
+    const studentId = req.student._id;
+
+    if (!studentId) {
+        throw new apiError(400, "Student id is required");
+    }
+
+    const student = await Student.findById({ _id: studentId })
+
+    if (!student) {
+        throw new apiError(404, "unauthorized user");
+    }
+
+    const stdClass = await Class.find({ students : studentId }) .populate("assignments quizzes")
+
+    if(!stdClass) {
+        throw new apiError(404, "Class not found")
+    }
+
+    res.status(200).json(new apiResponse(200, stdClass, "Class fetched successfully"));
 })
 
-export { 
+export {
     addClass,
-    getClass,
-    getClasses,
+    getStudentClass,
     getTeachersByCourse,
 }

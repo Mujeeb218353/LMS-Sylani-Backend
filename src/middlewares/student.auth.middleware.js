@@ -6,8 +6,9 @@ import { Student } from "../models/student.model.js";
 const verifyStudentJWT = asyncHandler(async(req, _, next)=>{
     try {
       const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+      
       if(!token){
-         throw new apiError(401, "Unauthorized request 123");
+         throw new apiError(401, "Unauthorized request");
       }
       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       const student = await Student.findById(decodedToken?._id).select("-password -refreshToken");

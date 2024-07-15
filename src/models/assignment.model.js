@@ -38,31 +38,11 @@ const assignmentSchema = new Schema(
                 marks: {
                     type: Number,
                 },
-                remarks: {
+                link:{
                     type: String,
-                },
-                links: [
-                    {
-                        title: {
-                            type: String,
-                            required: true,
-                        },
-                        url: {
-                            type: String,
-                            required: true,
-                        },
-                    }
-                ]
+                }
             },
-        ],
-        fields:[
-            {
-                title:{
-                    type: String,
-                    required: true,
-                },
-            }
-        ],
+        ]
     },
     {
         timestamps: true

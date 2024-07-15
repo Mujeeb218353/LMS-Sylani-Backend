@@ -17,26 +17,26 @@ const teacherSchema = new Schema(
             type: String,
             required: true,
         },
-        profile:{
+        profile: {
             type: String,
             required: true,
         },
-        role:{
+        role: {
             type: String,
             default: "teacher",
             required: true,
         },
-        city:{
+        city: {
             type: Schema.Types.ObjectId,
             ref: "City",
             required: true,
         },
-        campus:{
+        campus: {
             type: Schema.Types.ObjectId,
             ref: "Campus",
             required: true,
         },
-        course:{
+        course: {
             type: Schema.Types.ObjectId,
             ref: "Course",
             required: true,
@@ -53,16 +53,28 @@ const teacherSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Class",
         },
+        assignments: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Assignment",
+            }
+        ],
+        quizzes: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Quiz",
+            }
+        ],
         createdBy: {
             type: Schema.Types.ObjectId,
             ref: "Admin",
             required: true,
         },
-        isVerified:{
+        isVerified: {
             type: Boolean,
             default: false,
         },
-        refreshToken:{
+        refreshToken: {
             type: String,
         },
     },

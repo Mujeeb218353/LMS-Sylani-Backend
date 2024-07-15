@@ -8,6 +8,7 @@ import {
 } from '../controllers/teacher.controllers.js'
 import { upload } from '../middlewares/multer.middleware.js'
 import { verifyTeacherJWT } from '../middlewares/teacher.auth.middleware.js'
+import { createAssignment } from '../controllers/assignment.controllers.js'
 
 const router = Router()
 
@@ -19,5 +20,7 @@ router.route('/login').post(loginTeacher)
 router.route('/logout').post(verifyTeacherJWT, logoutTeacher)
 router.route('/getCurrentTeacher').get(verifyTeacherJWT, getCurrentTeacher)
 router.route('/refreshTeacherAccessToken').get(verifyTeacherJWT, refreshTeacherAccessToken);
+
+router.route('/createAssignment').post(verifyTeacherJWT, createAssignment)
 
 export default router
