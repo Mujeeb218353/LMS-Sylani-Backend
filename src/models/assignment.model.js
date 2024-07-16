@@ -37,10 +37,15 @@ const assignmentSchema = new Schema(
                 },
                 marks: {
                     type: Number,
+                    default: 0,
                 },
                 link:{
                     type: String,
-                }
+                },
+                submissionDate: {
+                    type: Date,
+                    default: Date.now,
+                },
             },
         ]
     },
