@@ -15,6 +15,8 @@ const createAssignment = asyncHandler(async (req, res) => {
         lastDate
     } = req.body
 
+    console.log(lastDate);
+
     if (!title) {
         throw new apiError(400, "Title is required")
     }
@@ -78,10 +80,81 @@ const getCreatedAssignment = asyncHandler(async (req, res) => {
 
 const editAssignment = asyncHandler(async (req, res) => {
 
+    const { title, description, lastDate } = req.body
+    const { assignmentId } = req.params;
+
+    if (!title) {
+        throw new apiError(400, "Title is required")
+    }
+
+    if (!description) {
+        throw new apiError(400, "Description is required")
+    }
+
+    if (!lastDate) {
+        throw new apiError(400, "Last date is required")
+    }
+
+    if (!assignmentId) {
+        throw new apiError(400, "Assignment not found")
+    }
+
+    const assignment = await Assignment.findById(assignmentId)
+
+    if (!assignment) {
+        throw new apiError(404, "Assignment not found")
+    }
+
+    assignment.title = title
+    assignment.description = description
+    assignment.lastDate = lastDate
+    await assignment.save()
+
+    res.status(200).json(new apiResponse(200, assignment, "Assignment updated successfully"))
 })
 
 const deleteAssignment = asyncHandler(async (req, res) => {
 
+    const { assignmentId } = req.params;
+
+    if (!assignmentId) {
+        throw new apiError(400, "Assignment is required")
+    }
+
+    const assignment = await Assignment.findById(assignmentId)
+
+    if (!assignment) {
+        throw new apiError(404, "Assignment not found")
+    }
+
+    const teacher = await Teacher.findById(req.teacher._id)
+
+    if (!teacher) {
+        throw new apiError(404, "Unauthorized user")
+    }
+
+    const savedClass = await Class.findById(teacher.instructorOfClass)
+
+    if (!savedClass) {
+        throw new apiError(404, "Class not found")
+    }
+
+
+    const index = savedClass.assignments.indexOf(assignmentId)
+
+    if (index === -1) {
+        throw new apiError(404, "Assignment not found1")
+    }
+
+    savedClass.assignments.splice(index, 1)
+    await savedClass.save()
+
+    teacher.assignments.splice(index, 1)
+    await teacher.save()
+
+    await assignment.deleteOne()
+
+    res.status(200).json(new apiResponse(200, null, "Assignment deleted successfully"))
 })
 
 // Student side
@@ -130,7 +203,7 @@ const submitAssignment = asyncHandler(async (req, res) => {
     assignment.submittedBy.push({
         studentId: req.student._id,
         link: assignmentLink,
-        submissionDate: new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+        submissionDate: Date.now()
     });
 
     await assignment.save()
@@ -151,7 +224,7 @@ const editSubmittedAssignment = asyncHandler(async (req, res) => {
         throw new apiError(400, "Assignment not found")
     }
 
-    const assignment = await Assignment.findById({ _id: assignmentId })
+    const assignment = await Assignment.findById(assignmentId)
 
     if (!assignment) {
         throw new apiError(404, "Assignment not found")
@@ -165,10 +238,8 @@ const editSubmittedAssignment = asyncHandler(async (req, res) => {
 
     const now = new Date();
 
-    console.log(now.getTime(), now.getTimezoneOffset());
-
     updateAssignment.link = assignmentLink
-    updateAssignment.submissionDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    updateAssignment.submissionDate = Date.now()
 
     await assignment.save()
 
@@ -179,38 +250,30 @@ const deleteSubmittedAssignment = asyncHandler(async (req, res) => {
 
     const { assignmentId } = req.params;
 
-    console.log(assignmentId);
-
     if (!assignmentId) {
         throw new apiError(400, "Assignment is required")
     }
 
-    const assignment = await Assignment.findById(assignmentId )
-
-    console.log("cross 1");
+    const assignment = await Assignment.findById(assignmentId)
 
     if (!assignment) {
         throw new apiError(404, "Assignment not found")
     }
 
-    console.log("cross 2");
     const submittedIndex = assignment.submittedBy.findIndex(
         (student) => student.studentId.toString() === req.student._id.toString()
     );
 
-    console.log("cross 3");
 
     if (submittedIndex === -1) {
         throw new apiError(404, "Submitted assignment not found");
     }
 
-    console.log("cross 4");
-    const deletedAssignment = assignment.submittedBy.splice(submittedIndex, 1)[0];
-    console.log("cross 5");
+    assignment.submittedBy.splice(submittedIndex, 1)[0];
 
     await assignment.save();
 
-    res.status(200).json(new apiResponse(200, deletedAssignment, "Assignment deleted successfully"));
+    res.status(200).json(new apiResponse(200, assignment, "Assignment deleted successfully"));
 
 })
 
