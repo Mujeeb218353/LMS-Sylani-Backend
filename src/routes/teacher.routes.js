@@ -13,6 +13,9 @@ import {
     getCreatedAssignment,
     editAssignment,
     deleteAssignment,
+    getStudentsSubmittedAssignment,
+    getStudentsNotSubmittedAssignment,
+    assignMarks,
 } from '../controllers/assignment.controllers.js'
 
 const router = Router()
@@ -30,5 +33,8 @@ router.route('/createAssignment').post(verifyTeacherJWT, createAssignment)
 router.route('/getCreatedAssignments').get(verifyTeacherJWT, getCreatedAssignment)
 router.route('/editAssignment/:assignmentId').put(verifyTeacherJWT, editAssignment)
 router.route('/deleteAssignment/:assignmentId').delete(verifyTeacherJWT, deleteAssignment)
+router.route('/getStudentsSubmittedAssignment/:assignmentId').get(verifyTeacherJWT, getStudentsSubmittedAssignment)
+router.route('/getStudentsNotSubmittedAssignment/:assignmentId').get(verifyTeacherJWT, getStudentsNotSubmittedAssignment)
+router.route('/assignMarks/:assignmentId').put(verifyTeacherJWT, assignMarks)
 
 export default router

@@ -19,7 +19,7 @@ const courseSchema = new Schema(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "Admin",
-      required: true
+      required: true  
     },
   },
   {

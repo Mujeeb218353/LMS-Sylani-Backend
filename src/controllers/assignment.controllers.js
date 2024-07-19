@@ -157,6 +157,95 @@ const deleteAssignment = asyncHandler(async (req, res) => {
     res.status(200).json(new apiResponse(200, null, "Assignment deleted successfully"))
 })
 
+
+const getStudentsSubmittedAssignment = asyncHandler(async (req, res) => {
+
+    const { assignmentId } = req.params
+
+    if (!assignmentId) {
+        throw new apiError(400, "Assignment is required")
+    }
+
+    const assignment = await Assignment.findById(assignmentId)
+    .populate('submittedBy.studentId', 'fullName rollNo')
+    .select('submittedBy title')
+
+    if (!assignment) {
+        throw new apiError(404, "Assignment not found")
+    }
+
+    const studentsSubmittedAssignments = assignment.submittedBy.map((student) => student.studentId);
+
+    res.status(200).json(new apiResponse(200, assignment, "Students fetched successfully"))
+})
+
+const getStudentsNotSubmittedAssignment = asyncHandler(async (req, res) => {
+    const { assignmentId } = req.params
+
+    if (!assignmentId) {
+        throw new apiError(400, "Assignment is required")
+    }
+
+    const assignment = await Assignment.findById(assignmentId)
+
+    if (!assignment) {
+        throw new apiError(404, "Assignment not found")
+    }
+
+ 
+    const studentsSubmittedAssignments = assignment.submittedBy.map((student) => student.studentId.toString());
+
+    const savedClass = await Class.findById(assignment.className).populate('students', 'fullName rollNo')
+
+    const studentsNotSubmittedAssignments = savedClass.students.filter((student) => !studentsSubmittedAssignments.includes(student._id.toString()));
+
+
+    res.status(200).json(new apiResponse(200, studentsNotSubmittedAssignments, "Students fetched successfully"))
+})
+
+const assignMarks = asyncHandler(async (req, res) => {
+
+    const { marks, studentId } = req.body
+    const { assignmentId } = req.params
+
+    if (!marks) {
+        throw new apiError(400, "Marks is required")
+    }
+
+    if (!studentId) {
+        throw new apiError(400, "Student is required")
+    }
+
+    if (!assignmentId) {
+        throw new apiError(400, "Assignment is required")
+    }
+    
+    const assignment = await Assignment.findById(assignmentId)
+
+    if (!assignment) {
+        throw new apiError(404, "Assignment not found")
+    }
+
+    const student = await Student.findById(studentId)
+
+    if (!student) {
+        throw new apiError(404, "Student not found")
+    }
+
+    const index = assignment.submittedBy.findIndex((student) => student.studentId.toString() === studentId.toString())
+
+    if (index === -1) {
+        throw new apiError(404, "Student not found")
+    }
+
+    assignment.submittedBy[index].marks = marks
+    await assignment.save()
+
+    const updatedMarks = assignment.submittedBy[index].marks
+
+    res.status(200).json(new apiResponse(200, updatedMarks, "Marks updated successfully"))
+})
+
 // Student side
 
 const getUnSubmittedAssignment = asyncHandler(async (req, res) => {
@@ -170,10 +259,10 @@ const getUnSubmittedAssignment = asyncHandler(async (req, res) => {
 })
 
 const getSubmittedAssignment = asyncHandler(async (req, res) => {
-    const savedClass = await Class.findById({ _id: req.student.enrolledInClass })
+    const savedClass = await Class.findById(req.student.enrolledInClass)
     const assignments = await Assignment.find({ className: savedClass._id })
-    const submittedAssignment = assignments.filter((assignment) => assignment.submittedBy.find((student) => student.studentId.toString() === req.student._id.toString()))
-    res.status(200).json(new apiResponse(200, submittedAssignment, "Assignment fetched successfully"))
+    const submittedAssignments = assignments.filter((assignment) => assignment.submittedBy.find((student) => student.studentId.toString() === req.student._id.toString()))
+    res.status(200).json(new apiResponse(200, submittedAssignments, "Assignment fetched successfully"))
 })
 
 const submitAssignment = asyncHandler(async (req, res) => {
@@ -202,6 +291,7 @@ const submitAssignment = asyncHandler(async (req, res) => {
 
     assignment.submittedBy.push({
         studentId: req.student._id,
+        studentName: req.student.fullName,
         link: assignmentLink,
         submissionDate: Date.now()
     });
@@ -287,4 +377,7 @@ export {
     editAssignment,
     deleteAssignment,
     deleteSubmittedAssignment,
+    getStudentsSubmittedAssignment,
+    getStudentsNotSubmittedAssignment,
+    assignMarks,
 }

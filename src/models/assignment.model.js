@@ -41,6 +41,7 @@ const assignmentSchema = new Schema(
                 },
                 link:{
                     type: String,
+                    required: true,
                 },
                 submissionDate: {
                     type: Date,
