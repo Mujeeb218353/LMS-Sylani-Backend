@@ -17,12 +17,22 @@ import {
     editSubmittedAssignment,
     deleteSubmittedAssignment,
 } from '../controllers/assignment.controllers.js'
+import { getCity } from '../controllers/city.controller.js'
+import { getCampus } from '../controllers/campus.controllers.js'
+import { getCourse } from '../controllers/course.controllers.js'
 
 const router = Router()
 
 router.route('/register').post(upload.single('profile'), registerStudent)
 
 router.route('/login').post(loginStudent)
+
+// get city
+router.route('/getCities').get(getCity)
+// get campus
+router.route('/getCampuses').get(getCampus)
+// get course
+router.route('/getCourses').get(getCourse)
 
 // secure routes
 router.route('/logout').post(verifyStudentJWT, logoutStudent)

@@ -249,7 +249,7 @@ const assignMarks = asyncHandler(async (req, res) => {
 // Student side
 
 const getUnSubmittedAssignment = asyncHandler(async (req, res) => {
-
+    if(req.student.enrolledInClass=== null) return
     const savedClass = await Class.findById({ _id: req.student.enrolledInClass })
     const assignments = await Assignment.find({ className: savedClass._id })
 
@@ -259,6 +259,7 @@ const getUnSubmittedAssignment = asyncHandler(async (req, res) => {
 })
 
 const getSubmittedAssignment = asyncHandler(async (req, res) => {
+    if(req.student.enrolledInClass=== null) return
     const savedClass = await Class.findById(req.student.enrolledInClass)
     const assignments = await Assignment.find({ className: savedClass._id })
     const submittedAssignments = assignments.filter((assignment) => assignment.submittedBy.find((student) => student.studentId.toString() === req.student._id.toString()))

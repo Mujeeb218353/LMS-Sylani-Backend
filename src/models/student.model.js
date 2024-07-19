@@ -16,11 +16,6 @@ const studentSchema = new Schema(
             type: String,
             required: true,
         },
-        classSchedule : {
-            type: String,
-            enum: ["Weekdays (Monday to Friday)", "Weekend (Saturday & Sunday)", "Both"],
-            required: true,
-        },
         fullName: {
             type: String,
             required: true,

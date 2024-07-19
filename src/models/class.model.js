@@ -5,7 +5,6 @@ const classSchema = new Schema(
         name: {
             type: String,
             required: true,
-            unique: true,
         },
         enrollmentKey: {
             type: String,
@@ -13,10 +12,6 @@ const classSchema = new Schema(
             unique: true,
         },
         batch: {
-            type: String,
-            required: true
-        },
-        timing: {
             type: String,
             required: true
         },

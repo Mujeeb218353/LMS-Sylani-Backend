@@ -16,7 +16,6 @@ const addClass = asyncHandler(async (req, res) => {
         name,
         enrollmentKey,
         batch,
-        timing,
         teacherId,
         cityId,
         courseId,
@@ -34,10 +33,6 @@ const addClass = asyncHandler(async (req, res) => {
 
     if (!batch) {
         throw new apiError(400, "Batch is required")
-    }
-
-    if (!timing) {
-        throw new apiError(400, "Timing is required")
     }
 
     if (!teacherId) {
@@ -65,6 +60,12 @@ const addClass = asyncHandler(async (req, res) => {
     const city = await City.findById({ _id: cityId });
     const campus = await Campus.findById({ _id: campusId });
     const course = await Course.findById({ _id: courseId });
+    const savedClass = await Class.findOne({ enrollmentKey: enrollmentKey });
+
+
+    if (savedClass) {
+        throw new apiError(400, "Enrollment Key already exists")
+    }
 
     if (!user) {
         throw new apiError(404, "Unauthorized user")
@@ -86,16 +87,11 @@ const addClass = asyncHandler(async (req, res) => {
         throw new apiError(404, "Course not found")
     }
 
-    if (teacher.instructorOfClass) {
-        throw new apiError(400, "Teacher is already assigned to a class")
-    }
-
 
     const newClass = new Class({
         name,
         enrollmentKey,
         batch,
-        timing,
         teacher: teacherId,
         city: cityId,
         course: courseId,
